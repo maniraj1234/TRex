@@ -119,6 +119,11 @@ var config = {
        cursors = this.input.keyboard.createCursorKeys();
        //this.input.on('pointerup',onTap);
   
+        this.input.on("touchstart", ()=>{
+            var clickDelay = this.time.now - lastTime;
+            lastTime = this.time.now;
+            onTap(clickDelay < 350)
+        });
         this.input.on("pointerdown", ()=>{
             var clickDelay = this.time.now - lastTime;
             lastTime = this.time.now;
