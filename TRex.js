@@ -37,6 +37,7 @@ var config = {
    var button;
    var scoreTracker;
    var objectEmitter;
+   var lastTime;
    
    var game = new Phaser.Game(config);
    
@@ -99,6 +100,7 @@ var config = {
        //text indicators
        scoreText = this.add.text(uiConfig.textGroupX, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
        bombText = this.add.text(uiConfig.textGroupX, scoreText.y+scoreText.height+uiConfig.rowGap, 'bombs left: '+bombCount, { fontSize: '32px', fill: '#000' });
+       //playKeysText = this.add.text(uiConfig.textGroupX, bombText.y+bombText.height+uiConfig.rowGap, 'press keys: up, right, down, space', { fontSize: '32px', fill: '#000' });
        gameOverText = this.add.text(config.width/2, 50, '', { fontSize: '60px', fill: '#000' });
        gameOverText.visible = false;
        scoreTracker = new ScoreTracker(this);
@@ -115,6 +117,13 @@ var config = {
        
        //  Input Events
        cursors = this.input.keyboard.createCursorKeys();
+       //this.input.on('pointerup',onTap);
+  
+        this.input.on("pointerdown", ()=>{
+            var clickDelay = this.time.now - lastTime;
+            lastTime = this.time.now;
+            onTap(clickDelay < 350)
+        });
    }
    function update ()
    {
@@ -151,7 +160,12 @@ var config = {
            player.setVelocityY(-330);
        }
    }
-   
+   function onTap(doubleTap){
+        if(doubleTap)
+            createBomb();
+        else
+            player.setVelocityY(-330);
+   }
    function onPlayerObstacleCollision (player, obstacle)
    {
        this.physics.pause();
