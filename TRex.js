@@ -202,7 +202,6 @@ var config = {
         obstacle.setCollideWorldBounds(false);
         obstacle.setVelocity(-300, 20);
         obstacle.allowGravity = false;
-        obstacle.lifespan = 2000;
         objCount++;
         if(objCount%10==0)
         {
