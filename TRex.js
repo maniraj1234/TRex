@@ -200,7 +200,7 @@ var config = {
         var obstacle = this.obstacles.create(appConfig.width, player.y, spriteName);
         //obstacle.setBounce(1);
         obstacle.setCollideWorldBounds(false);
-        obstacle.setVelocity(-300, 20);
+        obstacle.setVelocity(-300, 2000);
         obstacle.allowGravity = false;
         objCount++;
         if(objCount%10==0)
