@@ -17,7 +17,7 @@ class GameOverView
         this.gameOverText.anchor = 0.5;
         this.gameOverView.add(this.gameOverText);
 
-        this.playAgainText = this.gameApp.add.text(config.width/2, 120, 'PLAY AGAIN 🔄', { fontSize: '100px', fill: '#000' })
+        this.playAgainText = this.gameApp.add.text(config.width/2, 120, 'PLAY AGAIN 🔄', { fontSize: '80px', fill: '#000' })
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => this.onClickPlayAgain() );
             
