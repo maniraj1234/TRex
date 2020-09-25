@@ -32,12 +32,10 @@ var config = {
    var gameOver = false;
    var scoreText;
    var bombText;
-   var gameOverText;
    var bombCount = 5;
    var button;
-   var scoreTracker;
-   var objectEmitter;
    var lastTime;
+   var physics;
    
    var game = new Phaser.Game(config);
    
@@ -54,6 +52,7 @@ var config = {
    
    function create ()
    {
+        eventDispatcher = EventDispatcher.getInstance();
        
        this.add.image(400, 300, 'sky').setScale(Math.max(appConfig.width/400,appConfig.height/300));
        
@@ -91,20 +90,15 @@ var config = {
        bombs = this.physics.add.group();
        obstacles = this.physics.add.group();
 
-       //start creating obstacles
-       objectEmitter = new ObjectEmitter(this);
-       objectEmitter.startEmittingObjects();
-      
-   
-   
+       createObjects(this, eventDispatcher);
+     
        //text indicators
        scoreText = this.add.text(uiConfig.textGroupX, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
        bombText = this.add.text(uiConfig.textGroupX, scoreText.y+scoreText.height+uiConfig.rowGap, 'bombs left: '+bombCount, { fontSize: '32px', fill: '#000' });
        //playKeysText = this.add.text(uiConfig.textGroupX, bombText.y+bombText.height+uiConfig.rowGap, 'press keys: up, right, down, space', { fontSize: '32px', fill: '#000' });
        gameOverText = this.add.text(config.width/2, 50, '', { fontSize: '60px', fill: '#000' });
        gameOverText.visible = false;
-       scoreTracker = new ScoreTracker(this);
-       scoreTracker.startTracking(); 
+       
 
       
        //collision detection
@@ -129,6 +123,8 @@ var config = {
             lastTime = this.time.now;
             onTap(clickDelay < 350)
         });
+        eventDispatcher.on(EventsFactory.ON_CLICK_PLAY_AGAIN, reloadPage.bind(this));
+        eventDispatcher.emit(EventsFactory.START_GAME);
    }
    function update ()
    {
@@ -165,6 +161,20 @@ var config = {
            player.setVelocityY(-330);
        }
    }
+   function createObjects(gameApp, eventDispatcher)
+   {
+       //start creating obstacles
+        objectEmitter = new ObjectEmitter(gameApp);
+        objectEmitter.init(eventDispatcher);
+    
+        //start tracking score
+        scoreTracker = new ScoreTracker(gameApp);
+        scoreTracker.init(eventDispatcher);
+        
+        gameOverView = new GameOverView(gameApp);
+        gameOverView.init(eventDispatcher);
+
+   }
    function onTap(doubleTap){
         if(doubleTap)
             createBomb();
@@ -178,16 +188,10 @@ var config = {
        player.anims.play('turn');
        gameOver = true;
    
-       
-       scoreTracker.stopTracking();
+       eventDispatcher.emit(EventsFactory.ON_GAME_OVER);
        clearInterval(this.obstaclesCreater);
-       showGameOver();
+       //showGameOver();
        return;
-   }
-   function showPlayAgain()
-   {
-    button = game.add.button(appConfig.width/2 - 95, 460, 'button', onPlayAgain, this, 2, 1, 0);
-    button.input.useHandCursor = true;
    }
    function emitObject(objCount)
    {
@@ -198,6 +202,7 @@ var config = {
         obstacle.setCollideWorldBounds(false);
         obstacle.setVelocity(-300, 20);
         obstacle.allowGravity = false;
+        obstacle.lifespan = 2000;
         objCount++;
         if(objCount%10==0)
         {
@@ -213,17 +218,17 @@ var config = {
    }
    function createBomb()
    {
-       if(bombCount<=0)
-        return;
-       var x = player.x;
-   
-       var bomb = this.bombs.create(x, player.y, 'bomb');
-       bomb.setBounce(1);
-       bomb.setCollideWorldBounds(false);
-       bomb.setVelocity(200, 20);
-       bomb.allowGravity = false;
-       bombCount--;
-       bombText.setText('bombs left:'+bombCount);
+    if(bombCount<=0)
+    return;
+    var x = player.x;
+
+    var bomb = this.bombs.create(x, player.y, 'bomb');
+    bomb.setBounce(1);
+    bomb.setCollideWorldBounds(false);
+    bomb.setVelocity(200, 20);
+    bomb.allowGravity = false;
+    bombCount--;
+    bombText.setText('bombs left:'+bombCount);
    }
    function onObstacleBombCollision (obstacle, bomb)
    {
@@ -243,11 +248,11 @@ var config = {
    function updateScore(score){
     this.scoreText.setText('Score: ' + score);
    }
-   
-   function showGameOver()
-   {
-       this.gameOverText.setText('Game Over! :(');
-       gameOverText.setX(config.width/2);
-       gameOverText.visible = true;
+   function initGame(){
+    gameOver = false;
+    this.physics.resume();
+    eventDispatcher.emit(EventsFactory.START_GAME);
    }
-   
+   function reloadPage(){
+       window.location.reload();
+   }

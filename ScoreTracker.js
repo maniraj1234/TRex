@@ -2,21 +2,46 @@ class ScoreTracker
 {
     
     ScoreTracker(gameApp){
-        var gameApp = gameApp;
-        var score = 0;
-        var scoreTrackerInterval;
+        this.gameApp = gameApp;
+        this.score = 0;
+        this.scoreTrackerInterval = null;
+    }
+    init = function(eventDispatcher)
+    {
+        this.eventDispatcher = eventDispatcher;
+        
+        this.eventDispatcher.on(EventsFactory.RESET_EVENT,this.reset.bind(this));
+        this.eventDispatcher.on(EventsFactory.START_GAME,this.startGame.bind(this));
+        this.eventDispatcher.on(EventsFactory.ON_GAME_OVER,this.gameOver.bind(this));
+    }
+    reset = function()
+    {
+        this.score = 0;
+    }
+    startGame = function()
+    {
+        this.startTracking();
+    }
+    gameOver = function()
+    {
+        this.stopTracking();
     }
     startTracking(){
-        this.scoreTrackerInterval = setInterval(
-            function()
-            {
-                score +=1;
-                updateScore(score);
-            }.bind(this),500
-        );
+        if(!this.scoreTrackerInterval)
+        {
+            this.scoreTrackerInterval = setInterval(
+                function()
+                {
+                    score +=1;
+                    updateScore(score);
+                }.bind(this),500
+            );
+        }
     }
     stopTracking(){
-        clearInterval(this.scoreTrackerInterval);
+        if(this.scoreTrackerInterval)
+            clearInterval(this.scoreTrackerInterval);
+        this.scoreTrackerInterval = null;
     }
     getScore(){
         return this.score;
