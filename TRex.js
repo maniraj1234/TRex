@@ -223,7 +223,7 @@ var config = {
     var x = player.x;
 
     var bomb = this.bombs.create(x, player.y, 'bomb');
-    bomb.setBounce(1);
+    bomb.setBounce(0.7);
     bomb.setCollideWorldBounds(false);
     bomb.setVelocity(200, 20);
     bomb.allowGravity = false;
