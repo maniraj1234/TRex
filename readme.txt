@@ -10,4 +10,4 @@ space: to fire bullets
 playing on mobile?
 use tap to jump and double tap to fire a bullet.
 
-this game can be accessed from https://maniraj1234.github.io/WebGames/TRex.html
+this game can be accessed from https://maniraj1234.github.io/TRex/TRex.html
